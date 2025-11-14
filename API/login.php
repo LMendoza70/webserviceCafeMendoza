@@ -1,35 +1,26 @@
 <?php
     header('Content-Type: application/json');
     include_once __DIR__ . '/coneccion.php';
+    $alias = $_POST['alias'];
+    $contraseña = $_POST['contrasena'];
 
+    $sql = "SELECT alias, contraseña, nombre_completo, rol 
+    FROM users 
+    WHERE alias = '$alias' AND contraseña = '$contraseña'";
 
-    $user=$_POST[user];
-    $pass=$_POST[passowrd];
+    $result = $con->query($sql);
 
-    $consulta = "SELECT * FROM usuarios where usuario='$user' and password='$pass';";
-    $result = $con->query($consulta);
-    //opcional
-    $login = array();
-    
-    if ($result) {
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $login[] = $row;
-            }
-            echo json_encode($productores, JSON_UNESCAPED_UNICODE);
-        } else {
-            //envia mensaje cuando no hay productores
-            echo json_encode([
-                'error' => 'No se encontraron productores'
-            ]);
-        }
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $row['success'] = true;
+        echo json_encode($row);
     } else {
-        //envia mensaje de error en la consulta
         echo json_encode([
-            'error' => 'Error al ejecutar la consulta: ' . $con->error
+            'success' => false,
+            'message' => 'Usuario no encontrado'
         ]);
     }
     
-    $con->close();
+    $con->close();    
 ?>
 
